@@ -41,8 +41,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TipTimeScreen() {
     var amountInput by remember {mutableStateOf("0")}
+    var tipPercent by remember { mutableStateOf("15") }
+    val percent = tipPercent.toDoubleOrNull() ?: 15.0
     val amount = amountInput.toDoubleOrNull() ?: 0.0
-    val tip = calculateTip(amount)
+    val tip = calculateTip(amount, percent)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,9 +58,13 @@ fun TipTimeScreen() {
             fontSize = 24.sp
         )
         Spacer(Modifier.height(16.dp))
-        EditNumberField(
-            amountInput
-        ) { amountInput = it }
+        EditNumberField(amountInput, R.string.bill_amount) {
+            amountInput = it
+        }
+        Spacer(Modifier.height(8.dp))
+        EditNumberField(tipPercent, R.string.tip_percentage) {
+            tipPercent = it
+        }
         Spacer(Modifier.height(24.dp))
         Text(
             text = stringResource(id = R.string.tip_amount, tip),
@@ -72,13 +78,14 @@ fun TipTimeScreen() {
 @Composable
 fun EditNumberField(
     value : String,
+    labelRes : Int,
     onValueChange : (String) -> Unit
 ) {
     TextField(
         value = value,
         onValueChange = onValueChange, // in this case it is the value entered in the field
         label = {
-            Text(text = stringResource(id = R.string.cost_of_service))
+            Text(text = stringResource(id = labelRes))
         },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
