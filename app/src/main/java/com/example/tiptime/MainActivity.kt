@@ -3,6 +3,7 @@ package com.example.tiptime
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,9 +42,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TipTimeScreen() {
-    var amountInput by remember {mutableStateOf("0")}
-    var tipPercent by remember { mutableStateOf("15") }
-    val percent = tipPercent.toDoubleOrNull() ?: 15.0
+    var amountInput by remember {mutableStateOf("")}
+    var tipPercent by remember { mutableStateOf("") }
+    val percent = tipPercent.toDoubleOrNull() ?: 0.0
     val amount = amountInput.toDoubleOrNull() ?: 0.0
     val tip = calculateTip(amount, percent)
     Column(
@@ -58,13 +60,25 @@ fun TipTimeScreen() {
             fontSize = 24.sp
         )
         Spacer(Modifier.height(16.dp))
-        EditNumberField(amountInput, R.string.bill_amount) {
-            amountInput = it
-        }
+        EditNumberField(
+            value = amountInput,
+            labelRes = R.string.bill_amount,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
+            onValueChange = {amountInput = it}
+        )
         Spacer(Modifier.height(8.dp))
-        EditNumberField(tipPercent, R.string.tip_percentage) {
-            tipPercent = it
-        }
+        EditNumberField(
+            value = tipPercent,
+            labelRes = R.string.tip_percentage,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            onValueChange = {tipPercent = it}
+        )
         Spacer(Modifier.height(24.dp))
         Text(
             text = stringResource(id = R.string.tip_amount, tip),
@@ -78,26 +92,26 @@ fun TipTimeScreen() {
 @Composable
 fun EditNumberField(
     value : String,
-    labelRes : Int,
-    onValueChange : (String) -> Unit
+    @StringRes labelRes : Int,
+    onValueChange : (String) -> Unit,
+    modifier: Modifier = Modifier,
+    keyboardOptions: KeyboardOptions
 ) {
     TextField(
         value = value,
-        onValueChange = onValueChange, // in this case it is the value entered in the field
+        onValueChange = onValueChange, // in this case 'it' is the value entered in the field
         label = {
             Text(text = stringResource(id = labelRes))
         },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number
-        )
+        keyboardOptions = keyboardOptions
     )
 }
 
 private fun calculateTip(
     amount : Double,
-    tipPercent : Double = 15.0
+    tipPercent : Double
 ) : String {
     val tip = amount * (tipPercent / 100)
     return NumberFormat.getCurrencyInstance().format(tip)

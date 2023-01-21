@@ -4,5 +4,6 @@
     <string name="cost_of_service">Cost of Service</string>
     <string name="bill_amount">Bill Amount</string>
     <string name="tip_percentage">Tip (%)</string>
+    <string name="round_up_tip">Round up tip?</string>
     <string name="tip_amount">Tip amount: %s</string>
 </resources>
